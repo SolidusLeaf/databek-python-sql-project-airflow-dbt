@@ -1,0 +1,28 @@
+# Secrets
+.env
+*.pem
+
+# Data (never commit it)
+data/
+*.duckdb
+*.duckdb.wal
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# dbt
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+
+# Airflow
+logs/
+airflow.db
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

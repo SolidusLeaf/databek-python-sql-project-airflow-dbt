@@ -1,0 +1,50 @@
+name: earthquakes-pipeline
+
+services:
+  airflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    image: earthquakes-airflow:local
+    # "standalone" starts the API server, scheduler, DAG processor and triggerer
+    # in ONE container. Fine for a local proof of concept.
+    command: standalone
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+      # Local-only convenience: no login screen. The port below is bound to
+      # 127.0.0.1, so it is not reachable from other machines.
+      AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS: "true"
+      # Airflow's own metadata DB (SQLite) lives on a named volume so it
+      # survives "docker compose down".
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: sqlite:////opt/airflow/meta/airflow.db
+      # Lets DAG files do: from include.ingest import ...
+      PYTHONPATH: /opt/airflow
+      # Used by our own code and by dbt
+      DBT_PROFILES_DIR: /opt/airflow/dbt
+      DBT_BIN: /home/airflow/dbt-venv/bin/dbt
+      WAREHOUSE_DIR: /opt/airflow/warehouse
+      RAW_BACKUP_DIR: /opt/airflow/data/raw_json
+      USGS_FEED_URL: https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./include:/opt/airflow/include
+      - ./tests:/opt/airflow/tests
+      - ./dbt:/opt/airflow/dbt
+      # Raw JSON backup: a normal folder so you can see the files on your PC
+      - ./data/raw_json:/opt/airflow/data/raw_json
+      # DuckDB files (earthquakes.duckdb, later earthquakes_serving.duckdb)
+      - warehouse:/opt/airflow/warehouse
+      - airflow_meta:/opt/airflow/meta
+      - airflow_logs:/opt/airflow/logs
+    restart: unless-stopped
+
+  # Day 4: the Streamlit "dashboard" service gets added here. It will mount the
+  # "warehouse" volume read-only and read only earthquakes_serving.duckdb.
+
+volumes:
+  warehouse:
+  airflow_meta:
+  airflow_logs:
