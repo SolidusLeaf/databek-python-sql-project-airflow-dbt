@@ -1,0 +1,36 @@
+version: 2
+
+models:
+  - name: earthquakes
+    description: >
+      One row per earthquake (latest known version), typed and cleaned from
+      raw.raw_events. Times are UTC.
+    columns:
+      - name: event_id
+        description: USGS event id, the primary key.
+        data_tests:
+          - unique
+          - not_null
+      - name: event_time
+        data_tests:
+          - not_null
+      - name: updated_at
+        data_tests:
+          - not_null
+      - name: status
+        description: automatic = not yet reviewed, reviewed = checked by a seismologist.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['automatic', 'reviewed', 'deleted']
+      - name: alert
+        description: PAGER alert level. Mostly null.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['green', 'yellow', 'orange', 'red']
+      - name: tsunami
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1]

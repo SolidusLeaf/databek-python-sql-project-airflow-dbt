@@ -1,0 +1,10 @@
+# No secrets here: the path comes from the WAREHOUSE_DIR environment variable
+# that docker-compose.yml sets. DuckDB names the database after the file, so
+# this one is called "earthquakes" (earthquakes.duckdb).
+earthquakes:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('WAREHOUSE_DIR', '/opt/airflow/warehouse') }}/earthquakes.duckdb"
+      threads: 1   # one writer, matching the single-writer design

@@ -1,0 +1,33 @@
+version: 2
+
+models:
+  - name: earthquake_location_date
+    description: One row per earthquake with place, date, time and magnitude bucket.
+    columns:
+      - name: event_id
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('earthquakes')
+                field: event_id
+      - name: event_date
+        data_tests:
+          - not_null
+      - name: magnitude_bucket
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['unknown', 'below 2', '2 to 3.9', '4 to 5.9', '6 and above']
+
+  - name: earthquake_alerts
+    description: Events with a PAGER alert level (view, often empty on quiet days).
+    columns:
+      - name: alert
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['green', 'yellow', 'orange', 'red']

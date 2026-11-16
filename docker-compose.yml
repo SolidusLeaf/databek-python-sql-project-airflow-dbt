@@ -41,8 +41,24 @@ services:
       - airflow_logs:/opt/airflow/logs
     restart: unless-stopped
 
-  # Day 4: the Streamlit "dashboard" service gets added here. It will mount the
-  # "warehouse" volume read-only and read only earthquakes_serving.duckdb.
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+      args:
+        # Leave empty to install the latest duckdb. If the dashboard reports a
+        # version error, set this to the version used by the pipeline.
+        DUCKDB_VERSION: ${DUCKDB_VERSION:-}
+    image: earthquakes-dashboard:local
+    environment:
+      SERVING_DB: /warehouse/earthquakes_serving.duckdb
+    ports:
+      - "127.0.0.1:8501:8501"
+    volumes:
+      - ./dashboard:/app
+      # read-only: the dashboard can never modify the warehouse
+      - warehouse:/warehouse:ro
+    restart: unless-stopped
 
 volumes:
   warehouse:

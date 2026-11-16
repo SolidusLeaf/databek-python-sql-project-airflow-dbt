@@ -1,0 +1,22 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Landing layer written by include/ingest.py (append-only, one row per event version).
+    schema: raw
+    tables:
+      - name: raw_events
+        description: Every version of every earthquake as received from the USGS feed.
+        # Freshness measures when NEW data last arrived, not when the pipeline
+        # last ran. A quiet hour with no new events can warn even if all is well.
+        loaded_at_field: ingested_at
+        freshness:
+          warn_after: {count: 60, period: minute}
+          error_after: {count: 180, period: minute}
+        columns:
+          - name: event_id
+            data_tests:
+              - not_null
+          - name: updated_ms
+            data_tests:
+              - not_null
