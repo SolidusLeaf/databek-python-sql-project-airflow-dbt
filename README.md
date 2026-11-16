@@ -109,10 +109,8 @@ data/raw_json/   raw JSON backups (created by the pipeline, gitignored)
 
 ## Observed in operation
 
-<!-- CHECK each number against your own run before publishing -->
 
-- After the first night, about 70 scheduled runs succeeded and 2 failed. The failures coincided with a local network interruption; the next successful run picked up the missed events.
-- A 30-day backfill loaded about 10,000 events; 75 of them carry a PAGER alert (73 green, 1 yellow, 1 orange).
+- Over the first evening and night, about 70 scheduled runs succeeded and 2 failed. The failures coincided with a local network interruption; the next successful run picked up the missed events.
 
 ## Limitations
 
